@@ -92,42 +92,67 @@ GitHub Repository (HTML Project) -> Python Script (Check for New Commits via Git
 
 2. Create the Python script `check_commits.py`:
     ```python
-    import requests
-    import subprocess
+import requests
+import subprocess
+import os
 
-    GITHUB_REPO = 'your_username/your_repo'
-    LAST_COMMIT_FILE = '/tmp/last_commit.txt'
+# GitHub repository details
+GITHUB_REPO = 'devops-bharat05/Building-CI-CD-Pipeline-Tool'
+GITHUB_API_URL = f'https://api.github.com/repos/{GITHUB_REPO}/commits'
+GITHUB_TOKEN = ' '  # Optional, but recommended for higher rate limits
 
-    def get_latest_commit():
-        url = f'https://api.github.com/repos/{GITHUB_REPO}/commits'
-        response = requests.get(url)
+# File to store the last checked commit SHA
+LAST_COMMIT_FILE = '/Building-CI-CD-Pipeline-Tool/last_commit.txt'
+
+def get_latest_commit():
+    headers = {
+        'Authorization': f'token {GITHUB_TOKEN}'  # Optional, add if using a GitHub token
+    }
+
+    try:
+        # Fetch the latest commits
+        response = requests.get(GITHUB_API_URL, headers=headers)
         response.raise_for_status()
-        return response.json()[0]['sha']
+        latest_commit_sha = response.json()[0]['sha']
+        return latest_commit_sha
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching commits: {e}")
+        return None
 
-    def read_last_commit():
-        try:
-            with open(LAST_COMMIT_FILE, 'r') as file:
-                return file.read().strip()
-        except FileNotFoundError:
-            return None
+def read_last_commit():
+    if os.path.exists(LAST_COMMIT_FILE):
+        with open(LAST_COMMIT_FILE, 'r') as file:
+            return file.read().strip()
+    return None
 
-    def write_last_commit(commit_sha):
-        with open(LAST_COMMIT_FILE, 'w') as file:
-            file.write(commit_sha)
+def write_last_commit(commit_sha):
+    with open(LAST_COMMIT_FILE, 'w') as file:
+        file.write(commit_sha)
 
-    def main():
-        latest_commit = get_latest_commit()
-        last_commit = read_last_commit()
+def deploy_code():
+    # Run your bash deployment script
+    subprocess.run(['//Building-CI-CD-Pipeline-Tool/deploy_script.sh'], check=True)
+    print("Deployment completed.")
 
-        if latest_commit != last_commit:
-            print('New commit detected. Deploying...')
-            subprocess.run(['/path/to/your/deploy_script.sh'])
-            write_last_commit(latest_commit)
-        else:
-            print('No new commit.')
+def main():
+    latest_commit = get_latest_commit()
+    if not latest_commit:
+        print("Unable to fetch the latest commit.")
+        return
 
-    if __name__ == "__main__":
-        main()
+    last_commit = read_last_commit()
+
+    if latest_commit != last_commit:
+        print(f"New commit detected: {latest_commit}. Deploying...")
+        deploy_code()
+        write_last_commit(latest_commit)
+    else:
+        print("No new commit. Nothing to deploy.")
+
+if __name__ == "__main__":
+    main()
+
+
     ```
 
 ### Step 4: Write a Bash Script to Deploy the Code and Restart Nginx
