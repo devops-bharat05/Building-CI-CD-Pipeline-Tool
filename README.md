@@ -83,7 +83,19 @@ GitHub Repository (HTML Project) -> Python Script (Check for New Commits via Git
         ```bash
         sudo systemctl restart nginx
         ```
-
+4.  **Installing Crontab**
+   - Step 1: Install the ‘cronie’ package.
+     ```bash
+     sudo yum install cronie -y
+     ```
+   - Step 2: Enable the ‘cronie’ service.
+     ```bash
+     sudo systemctl enable crond.service
+     ```
+   - Step 3: Start the ‘cronie’ service.
+     ```bash
+     sudo systemctl start crond.service
+     ```
 ### Step 3: Write a Python Script to Check for New Commits Using GitHub API
 1. Install the required Python package:
     ```bash
