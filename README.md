@@ -22,7 +22,7 @@ This project aims to demonstrate the creation of a Continuous Integration and Co
 - **Nginx** installed and running on the server.
 - **Git** installed on the server.
 
-## Architectural Diagram
+## Architectural Flow
 GitHub Repository (HTML Project) -> Python Script (Check for New Commits via GitHub API) -> Cron Job (Scheduled to Run Python Script Every 5 Minutes) -> Bash Script (Deploys the Latest Code and Restarts Nginx) -> Nginx Web Server (Serves Updated HTML Project on AWS EC2 or Linux)
 
 
